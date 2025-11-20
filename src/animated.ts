@@ -3,7 +3,18 @@ import Stats from "stats.js";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { allActions, baseActions, crossFadeControls, currentBaseAction, prepareCrossFade, setupAnimations, updateAnimationWeights } from "./modules/animation";
+import {
+  allActions,
+  baseActions,
+  crossFadeControls,
+  currentBaseAction,
+  prepareCrossFade,
+  resetCameraToCenter,
+  setupAnimations,
+  updateAnimationWeights,
+  walkIn,
+  walkOut,
+} from "./modules/animation";
 import { mountGUI } from "./modules/gui";
 import { createDirectionalLight } from "./modules/light";
 import { params } from "./modules/parameters";
@@ -24,6 +35,14 @@ let shadowHelper: THREE.CameraHelper | undefined;
 let topDownCamera: THREE.PerspectiveCamera;
 let mixer: THREE.AnimationMixer;
 let clock: THREE.Clock;
+let isWalkingIn = { value: false };
+const walkInDistance = 10;
+const walkInDuration = 3000;
+const walkInSpeed = walkInDistance / (walkInDuration / 1000);
+let isWalkingOut = { value: false };
+const walkOutDistance = 10;
+const walkOutDuration = 3000;
+const walkOutSpeed = walkOutDistance / (walkOutDuration / 1000);
 
 const directionalLight = createDirectionalLight(params);
 
@@ -106,8 +125,8 @@ loader.load(
 
     // Create top-down camera
     topDownCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    topDownCamera.position.set(0, 20, 0);
-    topDownCamera.lookAt(model.position);
+    topDownCamera.position.set(0, 20, 10);
+    topDownCamera.lookAt(0, 0, 0);
 
     // Compute initial sun angles
     const { azimuth, altitude } = computeAnglesFromPosition(directionalLight.position);
@@ -129,12 +148,16 @@ loader.load(
       updateLight,
       shadowHelper,
       originalRotationY,
+      topDownCamera,
       animation: {
         baseActions,
         allActions,
         currentBaseAction,
         prepareCrossFade: (start, end, dur) => prepareCrossFade(mixer, start, end, dur),
         crossFadeControls,
+        walkIn: () => walkIn(mixer, topDownCamera, isWalkingIn),
+        walkOut: () => walkOut(mixer, topDownCamera, isWalkingOut),
+        resetCameraToCenter,
       },
     });
   },
@@ -160,6 +183,14 @@ function animate() {
     const mixerUpdateDelta = clock.getDelta();
     mixer.update(mixerUpdateDelta);
 
+    if (isWalkingIn.value && topDownCamera) {
+      topDownCamera.position.z -= walkInSpeed * mixerUpdateDelta;
+    }
+
+    if (isWalkingOut.value && topDownCamera) {
+      topDownCamera.position.z -= walkOutSpeed * mixerUpdateDelta;
+    }
+
     // Update weights
     updateAnimationWeights();
   }
@@ -181,6 +212,7 @@ function animate() {
   if (topDownCamera) {
     topDownCamera.aspect = window.innerWidth / 2 / window.innerHeight;
     topDownCamera.updateProjectionMatrix();
+    topDownCamera.lookAt(topDownCamera.position.x, 0, topDownCamera.position.z);
     renderer.render(scene, topDownCamera);
   }
 }

@@ -8,6 +8,9 @@ interface AnimationProps {
   currentBaseAction: { value: string };
   prepareCrossFade: (startAction: THREE.AnimationAction | null, endAction: THREE.AnimationAction | null, duration: number) => void;
   crossFadeControls: any[];
+  walkIn?: () => void;
+  walkOut?: () => void;
+  resetCameraToCenter?: (cam: THREE.PerspectiveCamera) => void;
 }
 
 interface MountGUIProps {
@@ -19,11 +22,12 @@ interface MountGUIProps {
   updateLight: () => void;
   shadowHelper: THREE.CameraHelper | undefined;
   originalRotationY: number;
+  topDownCamera?: THREE.PerspectiveCamera;
   animation?: AnimationProps;
 }
 
 export function mountGUI(props: MountGUIProps) {
-  const { gui, scene, model, directionalLight, params, updateLight, originalRotationY, animation } = props;
+  const { gui, scene, model, directionalLight, params, updateLight, originalRotationY, topDownCamera, animation } = props;
   let shadowHelper = props.shadowHelper;
   // Add rotation controller
   gui.add(params, "rotation", 0, 360).onChange((value: number) => {
@@ -111,7 +115,7 @@ export function mountGUI(props: MountGUIProps) {
 
   // Add animation controls if provided
   if (animation) {
-    const { baseActions, currentBaseAction, prepareCrossFade, crossFadeControls } = animation;
+    const { baseActions, currentBaseAction, prepareCrossFade, crossFadeControls, walkIn, walkOut, resetCameraToCenter } = animation;
     const folder = gui.addFolder("Base Actions");
 
     const baseNames = ["None", ...Object.keys(baseActions)];
@@ -122,6 +126,7 @@ export function mountGUI(props: MountGUIProps) {
       const control = folder.add(
         {
           [name]: () => {
+            if (resetCameraToCenter && topDownCamera) resetCameraToCenter(topDownCamera);
             const currentSettings = baseActions[currentBaseAction.value];
             const currentAction = currentSettings?.action ?? null;
             const action = settings?.action ?? null;
@@ -135,6 +140,14 @@ export function mountGUI(props: MountGUIProps) {
       );
 
       crossFadeControls.push(control);
+    }
+
+    if (walkIn) {
+      folder.add({ "Walk In": walkIn }, "Walk In");
+    }
+
+    if (walkOut) {
+      folder.add({ "Walk Out": walkOut }, "Walk Out");
     }
 
     folder.open();

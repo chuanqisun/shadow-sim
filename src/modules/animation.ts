@@ -117,3 +117,35 @@ export function updateAnimationWeights() {
     }
   }
 }
+
+export const resetCameraToCenter = (camera: THREE.PerspectiveCamera) => {
+  camera.position.z = 0;
+};
+
+export function walkIn(mixer: THREE.AnimationMixer, camera: THREE.PerspectiveCamera, isWalkingIn: { value: boolean }) {
+  const walkAction = baseActions.walk.action;
+  const idleAction = baseActions.idle.action;
+  if (walkAction && idleAction) {
+    camera.position.z = 10;
+    isWalkingIn.value = true;
+    prepareCrossFade(mixer, null, walkAction, 0.35);
+    setTimeout(() => {
+      isWalkingIn.value = false;
+      prepareCrossFade(mixer, walkAction, idleAction, 0.35);
+    }, 3000);
+  }
+}
+
+export function walkOut(mixer: THREE.AnimationMixer, camera: THREE.PerspectiveCamera, isWalkingOut: { value: boolean }) {
+  const walkAction = baseActions.walk.action;
+  const idleAction = baseActions.idle.action;
+  if (walkAction && idleAction) {
+    resetCameraToCenter(camera);
+    isWalkingOut.value = true;
+    prepareCrossFade(mixer, null, walkAction, 0.35);
+    setTimeout(() => {
+      isWalkingOut.value = false;
+      prepareCrossFade(mixer, walkAction, idleAction, 0.35);
+    }, 3000);
+  }
+}
