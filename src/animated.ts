@@ -182,10 +182,12 @@ function animate() {
 
     if (isWalkingIn.value && topDownCamera) {
       topDownCamera.position.z -= walkInSpeed * mixerUpdateDelta;
+      console.log("Top-down camera Z position:", topDownCamera.position.z);
     }
 
     if (isWalkingOut.value && topDownCamera) {
       topDownCamera.position.z -= walkOutSpeed * mixerUpdateDelta;
+      console.log("Top-down camera Z position:", topDownCamera.position.z);
     }
 
     // Update weights
