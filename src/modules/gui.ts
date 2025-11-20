@@ -2,6 +2,14 @@ import type GUI from "lil-gui";
 import * as THREE from "three";
 import type { Params } from "./parameters";
 
+interface AnimationProps {
+  baseActions: Record<string, { weight: number; action?: THREE.AnimationAction }>;
+  allActions: THREE.AnimationAction[];
+  currentBaseAction: { value: string };
+  prepareCrossFade: (startAction: THREE.AnimationAction | null, endAction: THREE.AnimationAction | null, duration: number) => void;
+  crossFadeControls: any[];
+}
+
 interface MountGUIProps {
   gui: GUI;
   scene: THREE.Scene;
@@ -11,10 +19,11 @@ interface MountGUIProps {
   updateLight: () => void;
   shadowHelper: THREE.CameraHelper | undefined;
   originalRotationY: number;
+  animation?: AnimationProps;
 }
 
 export function mountGUI(props: MountGUIProps) {
-  const { gui, scene, model, directionalLight, params, updateLight, originalRotationY } = props;
+  const { gui, scene, model, directionalLight, params, updateLight, originalRotationY, animation } = props;
   let shadowHelper = props.shadowHelper;
   // Add rotation controller
   gui.add(params, "rotation", 0, 360).onChange((value: number) => {
@@ -99,4 +108,35 @@ export function mountGUI(props: MountGUIProps) {
       }
     });
   });
+
+  // Add animation controls if provided
+  if (animation) {
+    const { baseActions, currentBaseAction, prepareCrossFade, crossFadeControls } = animation;
+    const folder = gui.addFolder("Base Actions");
+
+    const baseNames = ["None", ...Object.keys(baseActions)];
+
+    for (let i = 0, l = baseNames.length; i !== l; ++i) {
+      const name = baseNames[i];
+      const settings = baseActions[name];
+      const control = folder.add(
+        {
+          [name]: () => {
+            const currentSettings = baseActions[currentBaseAction.value];
+            const currentAction = currentSettings?.action ?? null;
+            const action = settings?.action ?? null;
+
+            if (currentAction !== action) {
+              prepareCrossFade(currentAction, action, 0.35);
+            }
+          },
+        },
+        name
+      );
+
+      crossFadeControls.push(control);
+    }
+
+    folder.open();
+  }
 }

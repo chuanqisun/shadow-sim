@@ -3,6 +3,7 @@ import Stats from "stats.js";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { allActions, baseActions, crossFadeControls, currentBaseAction, prepareCrossFade, setupAnimations, updateAnimationWeights } from "./modules/animation";
 import { mountGUI } from "./modules/gui";
 import { createDirectionalLight } from "./modules/light";
 import { params } from "./modules/parameters";
@@ -100,13 +101,8 @@ loader.load(
     mixer = new THREE.AnimationMixer(model);
     clock = new THREE.Clock();
 
-    // Play idle animation if available
-    const animations = gltf.animations;
-    const idleClip = animations.find((clip) => clip.name === "idle");
-    if (idleClip) {
-      const idleAction = mixer.clipAction(idleClip);
-      idleAction.play();
-    }
+    // Set up animations
+    setupAnimations(gltf, mixer);
 
     // Create top-down camera
     topDownCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -124,7 +120,23 @@ loader.load(
       directionalLight.position.copy(updateSunPosition(params.azimuth, params.altitude, distance));
     };
 
-    mountGUI({ gui, scene, model, directionalLight, params, updateLight, shadowHelper, originalRotationY });
+    mountGUI({
+      gui,
+      scene,
+      model,
+      directionalLight,
+      params,
+      updateLight,
+      shadowHelper,
+      originalRotationY,
+      animation: {
+        baseActions,
+        allActions,
+        currentBaseAction,
+        prepareCrossFade: (start, end, dur) => prepareCrossFade(mixer, start, end, dur),
+        crossFadeControls,
+      },
+    });
   },
   undefined,
   (error) => {
@@ -147,6 +159,9 @@ function animate() {
   if (mixer && clock) {
     const mixerUpdateDelta = clock.getDelta();
     mixer.update(mixerUpdateDelta);
+
+    // Update weights
+    updateAnimationWeights();
   }
 
   // Render left view (3D)
