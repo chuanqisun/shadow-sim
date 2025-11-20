@@ -1,5 +1,6 @@
 import type GUI from "lil-gui";
 import * as THREE from "three";
+import { CROSS_FADE_DURATION_MS } from "./animation";
 import type { Params } from "./parameters";
 
 interface AnimationProps {
@@ -132,7 +133,7 @@ export function mountGUI(props: MountGUIProps) {
             const action = settings?.action ?? null;
 
             if (currentAction !== action) {
-              prepareCrossFade(currentAction, action, 0.35);
+              prepareCrossFade(currentAction, action, CROSS_FADE_DURATION_MS / 1000);
             }
           },
         },

@@ -12,6 +12,7 @@ import {
   resetCameraToCenter,
   setupAnimations,
   updateAnimationWeights,
+  WALK_DURATION_MS,
   walkIn,
   walkOut,
 } from "./modules/animation";
@@ -36,13 +37,9 @@ let topDownCamera: THREE.PerspectiveCamera;
 let mixer: THREE.AnimationMixer;
 let clock: THREE.Clock;
 let isWalkingIn = { value: false };
-const walkInDistance = 10;
-const walkInDuration = 3000;
-const walkInSpeed = walkInDistance / (walkInDuration / 1000);
+const walkInSpeed = 10 / (WALK_DURATION_MS / 1000);
 let isWalkingOut = { value: false };
-const walkOutDistance = 10;
-const walkOutDuration = 3000;
-const walkOutSpeed = walkOutDistance / (walkOutDuration / 1000);
+const walkOutSpeed = 10 / (WALK_DURATION_MS / 1000);
 
 const directionalLight = createDirectionalLight(params);
 

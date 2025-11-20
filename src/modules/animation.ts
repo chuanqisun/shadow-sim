@@ -1,5 +1,10 @@
 import * as THREE from "three";
 
+const CROSS_FADE_DURATION_MS = 350;
+const WALK_DURATION_MS = 3000;
+
+export { CROSS_FADE_DURATION_MS, WALK_DURATION_MS };
+
 export const crossFadeControls: any[] = [];
 
 export const currentBaseAction = { value: "idle" };
@@ -128,11 +133,12 @@ export function walkIn(mixer: THREE.AnimationMixer, camera: THREE.PerspectiveCam
   if (walkAction && idleAction) {
     camera.position.z = 10;
     isWalkingIn.value = true;
-    prepareCrossFade(mixer, null, walkAction, 0.35);
+    prepareCrossFade(mixer, null, walkAction, CROSS_FADE_DURATION_MS / 1000);
+
     setTimeout(() => {
       isWalkingIn.value = false;
-      prepareCrossFade(mixer, walkAction, idleAction, 0.35);
-    }, 3000);
+      prepareCrossFade(mixer, walkAction, idleAction, CROSS_FADE_DURATION_MS / 1000);
+    }, WALK_DURATION_MS);
   }
 }
 
@@ -142,10 +148,10 @@ export function walkOut(mixer: THREE.AnimationMixer, camera: THREE.PerspectiveCa
   if (walkAction && idleAction) {
     resetCameraToCenter(camera);
     isWalkingOut.value = true;
-    prepareCrossFade(mixer, null, walkAction, 0.35);
+    prepareCrossFade(mixer, null, walkAction, CROSS_FADE_DURATION_MS / 1000);
     setTimeout(() => {
       isWalkingOut.value = false;
-      prepareCrossFade(mixer, walkAction, idleAction, 0.35);
-    }, 3000);
+      prepareCrossFade(mixer, walkAction, idleAction, CROSS_FADE_DURATION_MS / 1000);
+    }, WALK_DURATION_MS);
   }
 }
