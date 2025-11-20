@@ -123,11 +123,11 @@ export function updateAnimationWeights() {
   }
 }
 
-export const resetCameraToCenter = (camera: THREE.PerspectiveCamera) => {
+export const resetCameraToCenter = (camera: THREE.Camera) => {
   camera.position.z = 0;
 };
 
-export function walkIn(mixer: THREE.AnimationMixer, camera: THREE.PerspectiveCamera, isWalkingIn: { value: boolean }) {
+export function walkIn(mixer: THREE.AnimationMixer, camera: THREE.Camera, isWalkingIn: { value: boolean }) {
   const walkAction = baseActions.walk.action;
   const idleAction = baseActions.idle.action;
   if (walkAction && idleAction) {
@@ -142,7 +142,7 @@ export function walkIn(mixer: THREE.AnimationMixer, camera: THREE.PerspectiveCam
   }
 }
 
-export function walkOut(mixer: THREE.AnimationMixer, camera: THREE.PerspectiveCamera, isWalkingOut: { value: boolean }) {
+export function walkOut(mixer: THREE.AnimationMixer, camera: THREE.Camera, isWalkingOut: { value: boolean }) {
   const walkAction = baseActions.walk.action;
   const idleAction = baseActions.idle.action;
   if (walkAction && idleAction) {

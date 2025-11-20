@@ -11,7 +11,7 @@ interface AnimationProps {
   crossFadeControls: any[];
   walkIn?: () => void;
   walkOut?: () => void;
-  resetCameraToCenter?: (cam: THREE.PerspectiveCamera) => void;
+  resetCameraToCenter?: (cam: THREE.Camera) => void;
 }
 
 interface MountGUIProps {
@@ -23,7 +23,7 @@ interface MountGUIProps {
   updateLight: () => void;
   shadowHelper: THREE.CameraHelper | undefined;
   originalRotationY: number;
-  topDownCamera?: THREE.PerspectiveCamera;
+  topDownCamera?: THREE.Camera;
   animation?: AnimationProps;
 }
 

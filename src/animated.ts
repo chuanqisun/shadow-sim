@@ -33,7 +33,7 @@ const gui = new GUI();
 let model: THREE.Group; // Declare model globally
 let originalRotationY = 0;
 let shadowHelper: THREE.CameraHelper | undefined;
-let topDownCamera: THREE.PerspectiveCamera;
+let topDownCamera: THREE.OrthographicCamera;
 let mixer: THREE.AnimationMixer;
 let clock: THREE.Clock;
 let isWalkingIn = { value: false };
@@ -121,8 +121,8 @@ loader.load(
     setupAnimations(gltf, mixer);
 
     // Create top-down camera
-    topDownCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    topDownCamera.position.set(0, 20, 10);
+    topDownCamera = new THREE.OrthographicCamera(-5, 5, 5, -5, 0.1, 1000);
+    topDownCamera.position.set(0, 5, 10);
     topDownCamera.lookAt(0, 0, 0);
 
     // Compute initial sun angles
@@ -207,7 +207,12 @@ function animate() {
   renderer.setScissorTest(true);
   renderer.setClearColor(0x000000, 1);
   if (topDownCamera) {
-    topDownCamera.aspect = window.innerWidth / 2 / window.innerHeight;
+    const aspect = window.innerWidth / 2 / window.innerHeight;
+    const frustumSize = 10;
+    (topDownCamera as THREE.OrthographicCamera).left = -frustumSize * aspect;
+    (topDownCamera as THREE.OrthographicCamera).right = frustumSize * aspect;
+    (topDownCamera as THREE.OrthographicCamera).top = frustumSize;
+    (topDownCamera as THREE.OrthographicCamera).bottom = -frustumSize;
     topDownCamera.updateProjectionMatrix();
     topDownCamera.lookAt(topDownCamera.position.x, 0, topDownCamera.position.z);
     renderer.render(scene, topDownCamera);
@@ -219,7 +224,12 @@ window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / 2 / window.innerHeight;
   camera.updateProjectionMatrix();
   if (topDownCamera) {
-    topDownCamera.aspect = window.innerWidth / 2 / window.innerHeight;
+    const aspect = window.innerWidth / 2 / window.innerHeight;
+    const frustumSize = 10;
+    (topDownCamera as THREE.OrthographicCamera).left = -frustumSize * aspect;
+    (topDownCamera as THREE.OrthographicCamera).right = frustumSize * aspect;
+    (topDownCamera as THREE.OrthographicCamera).top = frustumSize;
+    (topDownCamera as THREE.OrthographicCamera).bottom = -frustumSize;
     topDownCamera.updateProjectionMatrix();
   }
   renderer.setSize(window.innerWidth, window.innerHeight);
