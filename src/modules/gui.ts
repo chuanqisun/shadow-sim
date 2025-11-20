@@ -2,16 +2,20 @@ import type GUI from "lil-gui";
 import * as THREE from "three";
 import type { Params } from "./parameters";
 
-export function mountGUI(
-  gui: GUI,
-  scene: THREE.Scene,
-  model: THREE.Group,
-  directionalLight: THREE.DirectionalLight,
-  params: Params,
-  updateLight: () => void,
-  shadowHelper: THREE.CameraHelper | undefined,
-  originalRotationY: number
-) {
+interface MountGUIProps {
+  gui: GUI;
+  scene: THREE.Scene;
+  model: THREE.Group;
+  directionalLight: THREE.DirectionalLight;
+  params: Params;
+  updateLight: () => void;
+  shadowHelper: THREE.CameraHelper | undefined;
+  originalRotationY: number;
+}
+
+export function mountGUI(props: MountGUIProps) {
+  const { gui, scene, model, directionalLight, params, updateLight, originalRotationY } = props;
+  let shadowHelper = props.shadowHelper;
   // Add rotation controller
   gui.add(params, "rotation", 0, 360).onChange((value: number) => {
     if (model) model.rotation.y = originalRotationY + (value * Math.PI) / 180;

@@ -124,7 +124,7 @@ loader.load(
       directionalLight.position.copy(updateSunPosition(params.azimuth, params.altitude, distance));
     };
 
-    mountGUI(gui, scene, model, directionalLight, params, updateLight, shadowHelper, originalRotationY);
+    mountGUI({ gui, scene, model, directionalLight, params, updateLight, shadowHelper, originalRotationY });
   },
   undefined,
   (error) => {
