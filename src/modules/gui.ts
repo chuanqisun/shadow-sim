@@ -1,6 +1,6 @@
 import type GUI from "lil-gui";
 import * as THREE from "three";
-import type { Params } from "./main";
+import type { Params } from "../main";
 
 export function mountGUI(
   gui: GUI,

@@ -3,8 +3,8 @@ import Stats from "stats.js";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { mountGUI } from "./gui";
-import { createDirectionalLight } from "./light";
+import { mountGUI } from "./modules/gui";
+import { createDirectionalLight } from "./modules/light";
 import "./style.css";
 import { computeAnglesFromPosition, updateSunPosition } from "./sun";
 
