@@ -7,6 +7,7 @@ export interface ShadowParams {
   shadowRight: number;
   shadowTop: number;
   shadowBottom: number;
+  shadowMapSize: number;
 }
 
 export function setupShadowCamera(light: THREE.DirectionalLight, params: ShadowParams) {
@@ -16,7 +17,7 @@ export function setupShadowCamera(light: THREE.DirectionalLight, params: ShadowP
   light.shadow.camera.right = params.shadowRight;
   light.shadow.camera.top = params.shadowTop;
   light.shadow.camera.bottom = params.shadowBottom;
-  light.shadow.mapSize.width = 2048;
-  light.shadow.mapSize.height = 2048;
+  light.shadow.mapSize.width = params.shadowMapSize;
+  light.shadow.mapSize.height = params.shadowMapSize;
   light.shadow.camera.updateProjectionMatrix();
 }

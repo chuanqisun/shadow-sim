@@ -1,6 +1,6 @@
 import type GUI from "lil-gui";
 import * as THREE from "three";
-import type { Params } from "../main";
+import type { Params } from "./parameters";
 
 export function mountGUI(
   gui: GUI,
@@ -53,6 +53,16 @@ export function mountGUI(
     directionalLight.shadow.camera.bottom = value;
     directionalLight.shadow.camera.updateProjectionMatrix();
     if (shadowHelper) shadowHelper.update();
+  });
+
+  // Add shadow map size control
+  gui.add(params, "shadowMapSize", 512, 8192, 256).onChange((value: number) => {
+    directionalLight.shadow.mapSize.width = value;
+    directionalLight.shadow.mapSize.height = value;
+    if (directionalLight.shadow.map) {
+      directionalLight.shadow.map.dispose();
+      directionalLight.shadow.map = null;
+    }
   });
 
   // Add shadow helper toggle

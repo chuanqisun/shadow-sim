@@ -9,7 +9,7 @@ import { params } from "./modules/parameters";
 import "./style.css";
 import { computeAnglesFromPosition, updateSunPosition } from "./sun";
 
-const basicModelUrl = `${import.meta.env.BASE_URL}models/basic_human_model.glb`;
+const basicModelUrl = `${import.meta.env.BASE_URL}models/xbot-default.glb`;
 
 const loader = new GLTFLoader();
 
@@ -21,6 +21,8 @@ let model: THREE.Group; // Declare model globally
 let originalRotationY = 0;
 let shadowHelper: THREE.CameraHelper | undefined;
 let topDownCamera: THREE.PerspectiveCamera;
+let mixer: THREE.AnimationMixer;
+let clock: THREE.Clock;
 
 const directionalLight = createDirectionalLight(params);
 
@@ -53,6 +55,19 @@ loader.load(
   basicModelUrl,
   (gltf) => {
     model = gltf.scene;
+
+    console.log("GLTF animations:", gltf.animations);
+    console.log("GLTF has animations:", gltf.animations.length > 0);
+
+    let hasSkeleton = false;
+    model.traverse((child) => {
+      if (child instanceof THREE.SkinnedMesh) {
+        hasSkeleton = true;
+        console.log("Found SkinnedMesh:", child.name);
+      }
+    });
+    console.log("Model contains skeleton:", hasSkeleton);
+
     model.traverse((child) => {
       if (child instanceof THREE.Mesh) {
         child.castShadow = true;
@@ -73,11 +88,25 @@ loader.load(
     });
     scene.add(model);
 
+    model.scale.set(4, 4, 4);
+
     // Position the model so its bottom touches the ground
     const box = new THREE.Box3().setFromObject(model);
     model.position.y -= box.min.y;
 
     originalRotationY = model.rotation.y;
+
+    // Set up animation mixer and clock
+    mixer = new THREE.AnimationMixer(model);
+    clock = new THREE.Clock();
+
+    // Play idle animation if available
+    const animations = gltf.animations;
+    const idleClip = animations.find((clip) => clip.name === "idle");
+    if (idleClip) {
+      const idleAction = mixer.clipAction(idleClip);
+      idleAction.play();
+    }
 
     // Create top-down camera
     topDownCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -113,6 +142,12 @@ function animate() {
   stats.update();
 
   controls.update();
+
+  // Update animation mixer
+  if (mixer && clock) {
+    const mixerUpdateDelta = clock.getDelta();
+    mixer.update(mixerUpdateDelta);
+  }
 
   // Render left view (3D)
   renderer.setViewport(0, 0, window.innerWidth / 2, window.innerHeight);
