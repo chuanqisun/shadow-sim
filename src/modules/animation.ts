@@ -138,7 +138,7 @@ export function walkIn(mixer: THREE.AnimationMixer, camera: THREE.PerspectiveCam
     setTimeout(() => {
       isWalkingIn.value = false;
       prepareCrossFade(mixer, walkAction, idleAction, CROSS_FADE_DURATION_MS / 1000);
-    }, WALK_DURATION_MS);
+    }, WALK_DURATION_MS - CROSS_FADE_DURATION_MS);
   }
 }
 
@@ -152,6 +152,6 @@ export function walkOut(mixer: THREE.AnimationMixer, camera: THREE.PerspectiveCa
     setTimeout(() => {
       isWalkingOut.value = false;
       prepareCrossFade(mixer, walkAction, idleAction, CROSS_FADE_DURATION_MS / 1000);
-    }, WALK_DURATION_MS);
+    }, WALK_DURATION_MS - CROSS_FADE_DURATION_MS);
   }
 }
